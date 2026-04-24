@@ -1,0 +1,28 @@
+/** @type {import('electron-builder').Configuration} */
+module.exports = {
+  appId: 'com.agentmesh.app',
+  productName: 'AgentMesh',
+  directories: {
+    output: 'release',
+  },
+  files: [
+    'dist/**/*',
+    'skills/**/*',
+    'package.json',
+  ],
+  extraResources: [
+    { from: 'node_modules/sql.js/dist/sql-wasm.wasm', to: 'sql-wasm.wasm' },
+  ],
+  extraMetadata: {
+    main: 'dist/main/main.js',
+  },
+  win: {
+    target: [{ target: 'nsis', arch: ['x64'] }],
+  },
+  mac: {
+    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
+  },
+  linux: {
+    target: [{ target: 'AppImage', arch: ['x64'] }],
+  },
+}

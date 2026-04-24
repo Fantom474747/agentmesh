@@ -1,0 +1,51 @@
+# Build outputs
+dist/
+out/
+release/
+
+# Node dependencies
+node_modules/
+
+# SQLite databases (user data)
+*.db
+*.db-shm
+*.db-wal
+dev.db
+
+# Lock files (large, auto-generated)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# User upload folder (runtime content, not source)
+Uploads/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Electron builder cache
+.cache/
+builder-debug.yml
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# OS artifacts
+.DS_Store
+Thumbs.db

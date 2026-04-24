@@ -1,0 +1,57 @@
+{
+  "name": "agentmesh",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop-first AI agent management platform — delegate tasks from Claude Code to local and free-tier cloud models",
+  "author": "Fantom474747",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fantom474747/agentmesh.git"
+  },
+  "homepage": "https://github.com/Fantom474747/agentmesh#readme",
+  "bugs": {
+    "url": "https://github.com/Fantom474747/agentmesh/issues"
+  },
+  "main": "dist/main/main.js",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "electron-vite build",
+    "build:renderer": "electron-vite build --mode renderer",
+    "build:main": "electron-vite build --mode main",
+    "preview": "electron-vite preview",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "js-yaml": "^4.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1",
+    "sql.js": "^1.14.1",
+    "ws": "^8.18.2",
+    "zod": "^3.24.3",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.15.3",
+    "@types/react": "^18.3.21",
+    "@types/react-dom": "^18.3.7",
+    "@types/sql.js": "^1.4.11",
+    "@types/ws": "^8.5.14",
+    "@vitejs/plugin-react": "^4.4.1",
+    "autoprefixer": "^10.4.21",
+    "electron": "^34.5.8",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^5.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.4",
+    "vitest": "^3.1.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat)",
+      "Bash(node_modules/electron/dist/electron.exe --no-sandbox _probe4.cjs)",
+      "Bash(rm _probe4.cjs)"
+    ]
+  }
+}

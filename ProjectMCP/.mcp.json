@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "agentmesh": {
+      "command": "node",
+      "args": ["/REPLACE/WITH/ABSOLUTE/PATH/TO/agentmesh/scripts/agentmesh-mcp.mjs"]
+    }
+  }
+}
+

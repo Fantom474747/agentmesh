@@ -1,0 +1,47 @@
+id: code_review
+name: code-review
+description: Reviews a codebase for bugs, security issues, and improvements. Pass a directory path and the agent will explore it autonomously using filesystem tools.
+icon: "🔍"
+version: "1.1"
+tags:
+  - coding
+  - review
+compatible_runners:
+  - ollama
+  - groq
+  - together
+  - openrouter
+tools:
+  - list_dir
+  - read_file
+  - search_files
+  - get_file_info
+tool_timeout_ms: 10000
+retry: 1
+fallback_skill: summarize
+input_schema:
+  type: object
+  properties:
+    path:
+      type: string
+      description: Path to the directory or file to review
+    focus:
+      type: string
+      description: Optional focus area, e.g. "security", "performance", "style"
+  required: [path]
+output_schema:
+  type: object
+  properties:
+    review:
+      type: string
+system_prompt: |
+  You are an expert code reviewer with access to filesystem tools. When given a path, you MUST use your tools to explore it before reviewing — never make assumptions about file contents.
+
+  Workflow:
+  1. Call list_dir with recursive=true to get the full file tree
+  2. Call get_file_info on interesting files/directories to check sizes
+  3. Call read_file on each relevant source file (use start_line/end_line for large files)
+  4. Call search_files to find patterns like TODO, FIXME, hardcoded secrets, or specific constructs
+  5. Write a structured review covering: bugs, security issues, performance, code quality, and suggestions
+
+  Be specific — cite file names and line numbers. Be constructive and prioritise findings by severity (critical / warning / suggestion).

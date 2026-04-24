@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agentmesh": {
+      "command": "node",
+      "args": ["scripts/agentmesh-mcp.mjs"]
+    }
+  }
+}
