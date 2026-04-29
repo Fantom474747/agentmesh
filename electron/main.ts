@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
-import { mkdirSync, writeFileSync, rmSync } from 'node:fs'
+import { mkdirSync, writeFileSync, rmSync, existsSync, cpSync } from 'node:fs'
 import { join } from 'node:path'
 import { initDb } from './db.js'
 import { startServer, emit, getSkillsDir, reloadSkills } from './server/index.js'
@@ -22,7 +22,18 @@ process.on('unhandledRejection', (reason) => {
   console.error('[main] unhandledRejection:', reason)
 })
 
+function seedSkillsIfNeeded(): void {
+  const dest = getSkillsDir()
+  if (existsSync(dest)) return
+  const seedSrc = app.isPackaged
+    ? join(process.resourcesPath, 'skills')
+    : join(__dirname, '../../skills')
+  mkdirSync(dest, { recursive: true })
+  cpSync(seedSrc, dest, { recursive: true })
+}
+
 async function createWindow(): Promise<void> {
+  seedSkillsIfNeeded()
   await initDb()
   serverPort = await startServer()
 
@@ -31,26 +42,29 @@ async function createWindow(): Promise<void> {
     mainWindow?.webContents.send(IpcChannel.AGENT_UPDATE, { id, status })
   })
 
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'icon.png')
+    : path.join(__dirname, '../../build/icons/icon.png')
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 900,
     minHeight: 600,
     backgroundColor: '#0a0a0a',
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
     titleBarStyle: 'hidden',
-    ...(process.platform === 'win32'
-      ? { titleBarOverlay: { color: '#171717', symbolColor: '#737373', height: 40 } }
-      : {}),
     show: false,
   })
 
   // IPC handlers
   ipcMain.handle(IpcChannel.GET_SERVER_PORT, () => serverPort)
+  ipcMain.handle(IpcChannel.GET_USERDATA_PATH, () => app.getPath('userData'))
   ipcMain.on('win:minimize', () => mainWindow?.minimize())
   ipcMain.on('win:maximize', () => {
     mainWindow?.isMaximized() ? mainWindow.unmaximize() : mainWindow?.maximize()

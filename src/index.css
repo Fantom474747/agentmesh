@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,27 +18,28 @@
   }
 
   body {
-    @apply bg-neutral-950 text-neutral-100;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #090d14;
+    color: theme('colors.neutral.100');
+    font-family: 'Syne', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-neutral-900;
+    background: #090d14;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-700 rounded;
+    background: #1a2535;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-600;
+    background: #243044;
   }
 }
 
@@ -49,23 +52,46 @@
   .no-drag {
     -webkit-app-region: no-drag;
   }
+
+  .nav-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(148, 163, 184, 0.3);
+    padding: 10px 16px 4px;
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    background: rgba(18, 163, 227, 0.08);
+    color: rgb(18, 163, 227);
+    border: 0.5px solid rgba(18, 163, 227, 0.2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
 }
 
 @layer components {
   .mono {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: 'Space Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     @apply text-sm;
   }
 
   .input {
-    @apply w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2
+    @apply w-full bg-neutral-800/80 border border-neutral-700/80 rounded px-3 py-2
            text-sm text-neutral-100 placeholder-neutral-600
            focus:outline-none focus:ring-1 focus:ring-teal/50 focus:border-teal/50
            transition-colors;
+    font-family: inherit;
   }
 
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium;
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+    font-family: 'Space Mono', monospace;
   }
 
   .badge-online {
@@ -81,7 +107,7 @@
   }
 
   .badge-running {
-    @apply badge bg-blue-500/10 text-blue-400 border border-blue-500/20;
+    @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20;
   }
 
   .badge-done {

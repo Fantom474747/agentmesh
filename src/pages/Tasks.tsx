@@ -19,10 +19,10 @@ export default function Tasks() {
       <h1 className="text-lg font-semibold text-neutral-100 mb-1">Tasks</h1>
       <p className="text-sm text-neutral-500 mb-8">Task history and execution logs</p>
 
-      <div className="rounded border border-neutral-800 bg-neutral-900">
+      <div className="rounded-xl border border-teal/[0.08] bg-mesh-bg3">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-neutral-800">
+            <tr className="border-b border-teal/[0.08]">
               <Th>ID</Th>
               <Th>Skill</Th>
               <Th>Agent</Th>
@@ -44,7 +44,7 @@ export default function Tasks() {
               tasks.map((t) => (
                 <tr
                   key={t.id}
-                  className="border-b border-neutral-800 last:border-0 cursor-pointer hover:bg-neutral-800/40 transition-colors"
+                  className="border-b border-teal/[0.08] last:border-0 cursor-pointer hover:bg-teal/[0.04] transition-colors"
                   onClick={() => setSelected(t)}
                 >
                   <td className="px-4 py-3 font-mono text-xs text-neutral-500">{t.id.slice(0, 8)}</td>
@@ -80,8 +80,8 @@ function TaskOutputModal({ task, onClose }: { task: Task; onClose: () => void })
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg w-[640px] max-h-[80vh] flex flex-col shadow-2xl">
-        <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+      <div className="bg-mesh-bg3 border border-teal/[0.1] rounded-xl w-[640px] max-h-[80vh] flex flex-col shadow-2xl">
+        <div className="px-6 py-4 border-b border-teal/[0.08] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold text-neutral-100">{task.skill}</span>
             <span className="font-mono text-xs text-neutral-600">{task.id.slice(0, 8)}</span>
@@ -93,7 +93,7 @@ function TaskOutputModal({ task, onClose }: { task: Task; onClose: () => void })
         <div className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
           <div>
             <p className="text-xs text-neutral-500 mb-1.5">Input</p>
-            <pre className="bg-neutral-950 border border-neutral-800 rounded p-3 text-xs text-neutral-400 font-mono whitespace-pre-wrap">
+            <pre className="bg-mesh-bg border border-teal/[0.08] rounded p-3 text-xs text-neutral-400 font-mono whitespace-pre-wrap">
               {task.input}
             </pre>
           </div>
@@ -101,7 +101,7 @@ function TaskOutputModal({ task, onClose }: { task: Task; onClose: () => void })
           {task.result && (
             <div>
               <p className="text-xs text-neutral-500 mb-1.5">Output</p>
-              <pre className="bg-neutral-950 border border-neutral-800 rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
+              <pre className="bg-mesh-bg border border-teal/[0.08] rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
                 {task.result}
               </pre>
             </div>
@@ -124,7 +124,7 @@ function TaskOutputModal({ task, onClose }: { task: Task; onClose: () => void })
             </p>
           )}
 
-          <div className="text-xs text-neutral-600 pt-2 border-t border-neutral-800 flex gap-6">
+          <div className="text-xs text-neutral-600 pt-2 border-t border-teal/[0.08] flex gap-6">
             <span>Created: {new Date(task.created_at).toLocaleString()}</span>
             {task.completed_at && (
               <span>Completed: {new Date(task.completed_at).toLocaleString()}</span>
@@ -135,7 +135,7 @@ function TaskOutputModal({ task, onClose }: { task: Task; onClose: () => void })
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-neutral-800 flex justify-end shrink-0">
+        <div className="px-6 py-4 border-t border-teal/[0.08] flex justify-end shrink-0">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"

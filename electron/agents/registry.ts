@@ -1,7 +1,24 @@
 import { randomUUID } from 'node:crypto'
+import { writeFileSync, unlinkSync, mkdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { app } from 'electron'
 import { dbRun, dbGet, dbAll } from '../db.js'
 import type { Agent, AgentType, AgentStatus } from '../../shared/types.js'
 import { createRunner } from './runners/index.js'
+
+function agentsDir(): string {
+  const dir = join(app.getPath('userData'), 'agents')
+  mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+function syncAgentFile(agent: Agent): void {
+  writeFileSync(join(agentsDir(), `${agent.id}.json`), JSON.stringify(agent, null, 2), 'utf-8')
+}
+
+function deleteAgentFile(id: string): void {
+  try { unlinkSync(join(agentsDir(), `${id}.json`)) } catch { /* already gone */ }
+}
 
 interface AgentRow {
   id: string
@@ -62,6 +79,7 @@ export function createAgent(
       agent.created_at,
     ],
   )
+  syncAgentFile(agent)
   return agent
 }
 
@@ -75,6 +93,7 @@ export function updateAgentStatus(id: string, status: AgentStatus, last_seen?: n
 
 export function deleteAgent(id: string): void {
   dbRun('DELETE FROM agents WHERE id = ?', [id])
+  deleteAgentFile(id)
 }
 
 let _healthInterval: ReturnType<typeof setInterval> | null = null

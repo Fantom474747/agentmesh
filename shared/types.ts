@@ -123,6 +123,7 @@ export interface JsonRpcError {
 // IPC channel names — always use these constants, never raw strings
 export enum IpcChannel {
   GET_SERVER_PORT = 'get-server-port',
+  GET_USERDATA_PATH = 'get-userdata-path',
   TASK_UPDATE = 'task-update',
   AGENT_UPDATE = 'agent-update',
   SKILL_SAVE = 'skill:save',
@@ -133,6 +134,7 @@ export enum IpcChannel {
 // Exposed to renderer via contextBridge — see electron/preload.ts
 export interface AgentMeshBridge {
   getServerPort(): Promise<number>
+  getUserDataPath(): Promise<string>
   winMinimize(): void
   winMaximize(): void
   winClose(): void

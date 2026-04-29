@@ -4,6 +4,7 @@ import type { SkillManifest } from '../shared/types.js'
 
 contextBridge.exposeInMainWorld('agentmesh', {
   getServerPort: () => ipcRenderer.invoke(IpcChannel.GET_SERVER_PORT),
+  getUserDataPath: () => ipcRenderer.invoke(IpcChannel.GET_USERDATA_PATH),
   winMinimize: () => ipcRenderer.send('win:minimize'),
   winMaximize: () => ipcRenderer.send('win:maximize'),
   winClose: () => ipcRenderer.send('win:close'),

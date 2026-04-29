@@ -20,7 +20,7 @@ let _skills: SkillManifest[] = []
 let _wss: WebSocketServer | null = null
 
 export function getSkillsDir(): string {
-  return join(electronApp.getAppPath(), 'skills')
+  return join(electronApp.getPath('userData'), 'skills')
 }
 
 export function reloadSkills(): void {

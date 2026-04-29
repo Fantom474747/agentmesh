@@ -28,3 +28,13 @@ dist-ssr
 dev.db
 *.db
 release/
+
+# Build outputs
+build/
+out/
+
+# Personal skills (not part of the public repo)
+skills/
+
+# Local Claude Code settings
+.claude/

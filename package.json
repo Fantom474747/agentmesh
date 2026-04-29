@@ -1,6 +1,6 @@
 {
   "name": "agentmesh",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Desktop-first AI agent management platform — delegate tasks from Claude Code to local and free-tier cloud models",
   "author": "Fantom474747",
@@ -13,12 +13,14 @@
   "bugs": {
     "url": "https://github.com/Fantom474747/agentmesh/issues"
   },
-  "main": "dist/main/main.js",
+  "main": "out/main/main.js",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "electron-vite build",
     "build:renderer": "electron-vite build --mode renderer",
     "build:main": "electron-vite build --mode main",
+    "build:icons": "node scripts/build-icons.mjs",
+    "package": "node scripts/build-icons.mjs && electron-vite build && electron-builder --config electron-builder.config.js",
     "preview": "electron-vite preview",
     "test": "vitest run --passWithNoTests"
   },
@@ -49,6 +51,7 @@
     "electron-builder": "^25.1.8",
     "electron-vite": "^5.0.0",
     "postcss": "^8.5.3",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "vite": "^6.3.4",

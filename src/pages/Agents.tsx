@@ -31,13 +31,12 @@ export default function Agents() {
         </button>
       </div>
 
-      <div className="rounded border border-neutral-800 bg-neutral-900">
+      <div className="rounded-xl border border-teal/[0.08] bg-mesh-bg3">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-neutral-800">
+            <tr className="border-b border-teal/[0.06]">
               <Th>Name</Th>
               <Th>Type</Th>
-              <Th>Skills</Th>
               <Th>Status</Th>
               <Th>Last seen</Th>
               <Th></Th>
@@ -46,24 +45,21 @@ export default function Agents() {
           <tbody>
             {loading && agents.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-neutral-500 py-12 text-sm">
+                <td colSpan={5} className="text-center text-neutral-500 py-12 text-sm">
                   Loading…
                 </td>
               </tr>
             ) : agents.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-neutral-500 py-12 text-sm">
+                <td colSpan={5} className="text-center text-neutral-500 py-12 text-sm">
                   No agents registered yet
                 </td>
               </tr>
             ) : (
               agents.map((agent) => (
-                <tr key={agent.id} className="border-b border-neutral-800 last:border-0">
+                <tr key={agent.id} className="border-b border-teal/[0.06] last:border-0">
                   <td className="px-4 py-3 text-neutral-200 font-medium">{agent.name}</td>
                   <td className="px-4 py-3 font-mono text-xs text-neutral-400">{agent.type}</td>
-                  <td className="px-4 py-3 text-xs text-neutral-500">
-                    {agent.skills.length > 0 ? agent.skills.join(', ') : '—'}
-                  </td>
                   <td className="px-4 py-3">
                     <span className={`badge-${agent.status}`}>{agent.status}</span>
                   </td>
@@ -160,8 +156,8 @@ function DirectPromptModal({ agent, onClose }: { agent: Agent; onClose: () => vo
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
-        <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+      <div className="bg-mesh-bg3 border border-teal/[0.1] rounded-xl w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
+        <div className="px-6 py-4 border-b border-teal/[0.08] flex items-center justify-between shrink-0">
           <div>
             <h2 className="text-sm font-semibold text-neutral-100">Prompt — {agent.name}</h2>
             <span className="font-mono text-xs text-neutral-600">{agent.type}</span>
@@ -211,7 +207,7 @@ function DirectPromptModal({ agent, onClose }: { agent: Agent; onClose: () => vo
               </div>
               <pre
                 ref={outputRef}
-                className="bg-neutral-950 border border-neutral-800 rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap overflow-y-auto max-h-48"
+                className="bg-mesh-bg border border-teal/[0.08] rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap overflow-y-auto max-h-48"
               >
                 {output || (status === 'running' ? '…' : '')}
               </pre>
@@ -221,7 +217,7 @@ function DirectPromptModal({ agent, onClose }: { agent: Agent; onClose: () => vo
           {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
 
-        <div className="px-6 py-4 border-t border-neutral-800 flex justify-end gap-3 shrink-0">
+        <div className="px-6 py-4 border-t border-teal/[0.08] flex justify-end gap-3 shrink-0">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors">
             Close
           </button>
@@ -238,6 +234,14 @@ function DirectPromptModal({ agent, onClose }: { agent: Agent; onClose: () => vo
   )
 }
 
+const MODEL_PLACEHOLDERS: Partial<Record<AgentType, string>> = {
+  ollama: 'llama3',
+  groq: 'llama-3.1-8b-instant',
+  huggingface: 'mistralai/Mistral-7B-Instruct-v0.2',
+  together: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+  openrouter: 'meta-llama/llama-3.1-8b-instruct:free',
+}
+
 function AddAgentModal({ onClose }: { onClose: () => void }) {
   const { add } = useAgentStore()
   const [name, setName] = useState('')
@@ -246,21 +250,12 @@ function AddAgentModal({ onClose }: { onClose: () => void }) {
   const [model, setModel] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [script, setScript] = useState('')
-  const [skills, setSkills] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   const isOllama = type === 'ollama'
   const isApiKey = type === 'groq' || type === 'huggingface' || type === 'together' || type === 'openrouter'
   const isLocal = type === 'local_script' || type === 'local_docker'
-
-  const MODEL_PLACEHOLDERS: Partial<Record<AgentType, string>> = {
-    ollama: 'llama3',
-    groq: 'llama-3.1-8b-instant',
-    huggingface: 'mistralai/Mistral-7B-Instruct-v0.2',
-    together: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
-    openrouter: 'meta-llama/llama-3.1-8b-instruct:free',
-  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,7 +272,7 @@ function AddAgentModal({ onClose }: { onClose: () => void }) {
         name: name.trim(),
         type,
         endpoint: endpoint.trim() || undefined,
-        skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
+        skills: [],
         config,
       })
       onClose()
@@ -289,8 +284,8 @@ function AddAgentModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg w-[480px] shadow-2xl">
-        <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between">
+      <div className="bg-mesh-bg3 border border-teal/[0.1] rounded-xl w-[480px] shadow-2xl">
+        <div className="px-6 py-4 border-b border-teal/[0.08] flex items-center justify-between">
           <h2 className="text-sm font-semibold text-neutral-100">Add Agent</h2>
           <button onClick={onClose} className="text-neutral-500 hover:text-neutral-200 text-lg leading-none">×</button>
         </div>
@@ -356,15 +351,6 @@ function AddAgentModal({ onClose }: { onClose: () => void }) {
               />
             </Field>
           )}
-
-          <Field label="Skills (comma-separated)">
-            <input
-              className="input"
-              value={skills}
-              onChange={(e) => setSkills(e.target.value)}
-              placeholder="summarize, code_review"
-            />
-          </Field>
 
           {error && <p className="text-xs text-red-400">{error}</p>}
 

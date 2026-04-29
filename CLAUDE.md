@@ -61,7 +61,7 @@ agentmesh/
 ├── tests/
 │   └── runners/                  # One test file per runner
 ├── package.json
-├── vite.config.ts                # Renderer build (outDir: dist/renderer)
+├── vite.config.ts                # Renderer build (outDir: out/renderer)
 └── electron-builder.config.js   # Packaging (targets Windows/macOS/Linux)
 ```
 
@@ -187,8 +187,8 @@ interface AgentRunner {
 
 | Output | Path |
 |--------|------|
-| Renderer | `dist/renderer/` |
-| Electron main | `dist/main/` |
+| Renderer | `out/renderer/` |
+| Electron main | `out/main/` |
 | Packaged app | `release/` |
 
-In dev, Electron loads `http://localhost:5173` (Vite). In prod, it loads `dist/renderer/index.html` via `file://`.
+In dev, Electron loads `http://localhost:5173` (Vite). In prod, it loads `out/renderer/index.html` via `file://`.

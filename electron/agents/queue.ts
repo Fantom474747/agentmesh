@@ -74,7 +74,9 @@ export function updateTaskStatus(
   )
 }
 
-// Select an agent for a skill, respecting preferred_agent, require_online, and compatible_runners
+// Select an agent for a skill.
+// By default any agent is eligible. When a skill specifies a model, only agents
+// with config.model matching that value are considered.
 export function selectAgent(skill: SkillManifest | undefined, forcedAgentId?: string): Agent | undefined {
   const agents = registry.listAgents()
 
@@ -84,24 +86,20 @@ export function selectAgent(skill: SkillManifest | undefined, forcedAgentId?: st
   if (skill?.preferred_agent) {
     const preferred = registry.getAgent(skill.preferred_agent)
     if (preferred?.status === 'online') return preferred
-    // preferred is offline — fall through to auto-selection unless require_online is also set
   }
 
-  const useAnyRunner = !skill || !!skill.allow_all_runners
   const requireOnline = !!skill?.require_online
 
-  if (useAnyRunner) {
-    const online = agents.find((a) => a.status === 'online')
-    if (online) return online
-    if (requireOnline) return undefined  // no online agent, and require_online is set
-    return agents[0]
-  }
+  // When skill has a model set, restrict to agents configured with that model
+  const modelFilter = skill?.model
+  const pool = modelFilter
+    ? agents.filter((a) => (a.config.model as string | undefined) === modelFilter)
+    : agents
 
-  const compatible = agents.filter((a) => skill!.compatible_runners.includes(a.type))
-  const onlineCompatible = compatible.find((a) => a.status === 'online')
-  if (onlineCompatible) return onlineCompatible
+  const online = pool.find((a) => a.status === 'online')
+  if (online) return online
   if (requireOnline) return undefined
-  return compatible[0]
+  return pool[0]
 }
 
 type RunTaskFn = (

@@ -16,6 +16,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.1.1] — 2026-04-28
+
+### Added
+- **Settings page — appearance controls**: font size (Small / Medium / Large), UI scale (Compact / Normal / Comfortable), and reduced-motion toggle; persisted via new `settingsStore` Zustand slice
+- **Dashboard — live clock**: real-time clock display updated every second
+- **Dashboard — MCP tools panel**: lists available MCP tool names at a glance
+- **Dashboard — agent ring chart**: circular progress indicator showing online/total agent ratio
+- **Agent file sync**: each agent is now mirrored as `userData/agents/<id>.json` on create/delete, enabling external tooling to read agent configs without a DB connection
+- **Icon build script** (`scripts/build-icons.mjs`): generates platform icons from source SVG using `sharp`; wired into the `package` npm script
+- **Custom nav icons**: inline SVG icons for each sidebar nav item (Dashboard, Agents, Tasks, Skills, Settings)
+
+### Changed
+- Switched renderer router from `BrowserRouter` to `HashRouter` for correct `file://` navigation in packaged builds
+- **Agent selection** now respects `skill.model`: when a skill specifies a model override, only agents whose configured model matches are eligible; falls back to any online agent if none match
+- Dashboard, Settings, Skills, and Agents pages redesigned with consistent topbar layout and refined spacing
+- Theme tokens migrated from raw Tailwind neutrals to semantic CSS vars (`bg-mesh-bg`, `teal`, etc.)
+- `.gitignore` extended to exclude `skills/`, `build/`, `out/`, and `.claude/` from the public repository
+
+### Fixed
+- `preferred_agent` fallback logic no longer blocks auto-selection when the preferred agent is offline and `require_online` is not set
+
+---
+
 ## [0.1.0] — 2026-04-23
 
 Initial release.

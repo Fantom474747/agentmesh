@@ -4,10 +4,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        teal: 'rgb(29 158 117 / <alpha-value>)',
+        teal: 'rgb(18 163 227 / <alpha-value>)',
+        mesh: {
+          bg:  '#090d14',
+          bg2: '#0d1420',
+          bg3: '#111825',
+        },
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+        mono: ['Space Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       },
     },
   },

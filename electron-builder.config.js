@@ -6,18 +6,23 @@ module.exports = {
     output: 'release',
   },
   files: [
-    'dist/**/*',
-    'skills/**/*',
+    { from: 'out', to: 'out' },
     'package.json',
   ],
   extraResources: [
     { from: 'node_modules/sql.js/dist/sql-wasm.wasm', to: 'sql-wasm.wasm' },
+    { from: 'skills', to: 'skills' },
+    { from: 'build/icons/icon.png', to: 'icon.png' },
   ],
   extraMetadata: {
-    main: 'dist/main/main.js',
+    main: 'out/main/main.js',
   },
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
+  },
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
   },
   mac: {
     target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],

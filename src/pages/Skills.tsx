@@ -124,7 +124,7 @@ export default function Skills() {
       {loading ? (
         <p className="text-sm text-neutral-500">Loading…</p>
       ) : visible.length === 0 ? (
-        <div className="rounded border border-neutral-800 bg-neutral-900 p-6">
+        <div className="rounded-xl border border-teal/[0.08] bg-mesh-bg3 p-6">
           <p className="text-sm text-neutral-500 text-center py-8">
             {tagFilter ? `No skills tagged "${tagFilter}".` : (
               <>No skill manifests loaded. Skills are auto-loaded from{' '}
@@ -142,6 +142,7 @@ export default function Skills() {
               onRun={() => setRunTarget(s)}
               onEdit={() => setEditTarget(s)}
               onDelete={() => handleDelete(s)}
+              onSaved={refetch}
             />
           ))}
         </div>
@@ -180,19 +181,95 @@ function SourceBadge({ source }: { source?: 'yaml' | 'markdown' }) {
 
 // ── Skill card ────────────────────────────────────────────────────────────────
 
+function TagEditor({ skill, onSaved }: { skill: SkillManifest; onSaved: () => void }) {
+  const [tags, setTags] = useState<string[]>(skill.tags ?? [])
+  const [input, setInput] = useState('')
+  const [saving, setSaving] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const persist = async (next: string[]) => {
+    setSaving(true)
+    try {
+      await window.agentmesh.skillSave({ ...skill, tags: next.length ? next : undefined })
+      onSaved()
+    } catch {
+      // revert on failure
+      setTags(skill.tags ?? [])
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const addTag = () => {
+    const val = input.trim().toLowerCase().replace(/\s+/g, '-')
+    if (!val || tags.includes(val)) { setInput(''); return }
+    const next = [...tags, val]
+    setTags(next)
+    setInput('')
+    persist(next)
+  }
+
+  const removeTag = (tag: string) => {
+    const next = tags.filter((t) => t !== tag)
+    setTags(next)
+    persist(next)
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {tags.map((t) => (
+        <span
+          key={t}
+          className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700"
+        >
+          {t}
+          <button
+            type="button"
+            onClick={() => removeTag(t)}
+            disabled={saving}
+            className="text-neutral-600 hover:text-red-400 transition-colors leading-none disabled:opacity-40"
+          >
+            ×
+          </button>
+        </span>
+      ))}
+      <input
+        ref={inputRef}
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); addTag() }
+          if (e.key === 'Backspace' && !input && tags.length) {
+            const next = tags.slice(0, -1)
+            setTags(next)
+            persist(next)
+          }
+        }}
+        onBlur={addTag}
+        disabled={saving}
+        placeholder={tags.length ? '' : 'add tag…'}
+        className="text-xs bg-transparent text-neutral-400 placeholder-neutral-700 outline-none w-20 disabled:opacity-40"
+      />
+    </div>
+  )
+}
+
 function SkillCard({
   skill,
   onRun,
   onEdit,
   onDelete,
+  onSaved,
 }: {
   skill: SkillManifest
   onRun: () => void
   onEdit: () => void
   onDelete: () => void
+  onSaved: () => void
 }) {
   return (
-    <div className="rounded border border-neutral-800 bg-neutral-900 flex flex-col">
+    <div className="rounded-xl border border-teal/[0.08] bg-mesh-bg3 flex flex-col">
       <div className="p-5 flex items-start justify-between gap-6">
         <div className="flex-1 min-w-0">
           {/* Title row */}
@@ -214,11 +291,6 @@ function SkillCard({
                 chain×{skill.chain.length}
               </span>
             ) : null}
-            {skill.allow_all_runners && (
-              <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-neutral-700 text-neutral-300 border border-neutral-600">
-                any runner
-              </span>
-            )}
           </div>
 
           {/* Description */}
@@ -229,64 +301,48 @@ function SkillCard({
             <p className="text-xs text-neutral-600 mb-2">by {skill.author}</p>
           )}
 
-          {/* Tags */}
-          {skill.tags?.length ? (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {skill.tags.map((t) => (
-                <span key={t} className="text-xs px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-500 border border-neutral-700">
-                  {t}
-                </span>
-              ))}
-            </div>
-          ) : null}
-
-          {/* Runner / model / exec badges */}
-          <div className="flex flex-wrap gap-1.5 items-center">
-            {skill.model && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800">
-                {skill.model}
-              </span>
-            )}
-            {skill.temperature !== undefined && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-orange-950 text-orange-400 border border-orange-800">
-                t={skill.temperature}
-              </span>
-            )}
-            {skill.max_tokens !== undefined && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
-                {skill.max_tokens} tok
-              </span>
-            )}
-            {skill.timeout_ms !== undefined && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
-                {skill.timeout_ms / 1000}s
-              </span>
-            )}
-            {(skill.retry ?? 0) > 0 && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
-                retry×{skill.retry}
-              </span>
-            )}
-            {skill.fallback_skill && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-500 border border-neutral-700">
-                ↩ {skill.fallback_skill}
-              </span>
-            )}
-            {skill.require_online && (
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800">
-                require online
-              </span>
-            )}
-            {skill.allow_all_runners ? (
-              <span className="font-mono text-xs text-neutral-500 italic">all runner types</span>
-            ) : (
-              skill.compatible_runners.map((r) => (
-                <span key={r} className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
-                  {r}
-                </span>
-              ))
-            )}
+          {/* Tags — inline editable */}
+          <div className="mb-2">
+            <TagEditor skill={skill} onSaved={onSaved} />
           </div>
+
+          {/* Exec badges */}
+          {(skill.temperature !== undefined || skill.max_tokens !== undefined ||
+            skill.timeout_ms !== undefined || (skill.retry ?? 0) > 0 ||
+            skill.fallback_skill || skill.require_online) && (
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {skill.temperature !== undefined && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-orange-950 text-orange-400 border border-orange-800">
+                  t={skill.temperature}
+                </span>
+              )}
+              {skill.max_tokens !== undefined && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                  {skill.max_tokens} tok
+                </span>
+              )}
+              {skill.timeout_ms !== undefined && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                  {skill.timeout_ms / 1000}s
+                </span>
+              )}
+              {(skill.retry ?? 0) > 0 && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+                  retry×{skill.retry}
+                </span>
+              )}
+              {skill.fallback_skill && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-500 border border-neutral-700">
+                  ↩ {skill.fallback_skill}
+                </span>
+              )}
+              {skill.require_online && (
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800">
+                  require online
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <button
           onClick={onRun}
@@ -295,7 +351,7 @@ function SkillCard({
           Run
         </button>
       </div>
-      <div className="px-5 py-2.5 border-t border-neutral-800 flex gap-3">
+      <div className="px-5 py-2.5 border-t border-teal/[0.08] flex gap-3">
         <button onClick={onEdit} className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors">
           Edit
         </button>
@@ -439,10 +495,10 @@ function SkillFormModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg w-[640px] max-h-[90vh] flex flex-col shadow-2xl">
+      <div className="bg-mesh-bg3 border border-teal/[0.1] rounded-xl w-[640px] max-h-[90vh] flex flex-col shadow-2xl">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-b border-teal/[0.08] flex items-center justify-between shrink-0">
           <h2 className="text-sm font-semibold text-neutral-100">
             {isNew ? 'New Skill' : `Edit — ${form.name}`}
           </h2>
@@ -759,7 +815,7 @@ function SkillFormModal({
           {error && <p className="text-xs text-red-400">{error}</p>}
         </form>
 
-        <div className="px-6 py-4 border-t border-neutral-800 flex justify-end gap-3 shrink-0">
+        <div className="px-6 py-4 border-t border-teal/[0.08] flex justify-end gap-3 shrink-0">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors">
             Cancel
           </button>
@@ -839,8 +895,8 @@ function RunTaskModal({ skill, onClose }: { skill: SkillManifest; onClose: () =>
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-lg w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
-        <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between shrink-0">
+      <div className="bg-mesh-bg3 border border-teal/[0.1] rounded-xl w-[600px] max-h-[80vh] flex flex-col shadow-2xl">
+        <div className="px-6 py-4 border-b border-teal/[0.08] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             {skill.icon && <span className="text-base">{skill.icon}</span>}
             <h2 className="text-sm font-semibold text-neutral-100">Run — {skill.name}</h2>
@@ -879,7 +935,7 @@ function RunTaskModal({ skill, onClose }: { skill: SkillManifest; onClose: () =>
               </div>
               <pre
                 ref={outputRef}
-                className="bg-neutral-950 border border-neutral-800 rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap overflow-y-auto max-h-48"
+                className="bg-mesh-bg border border-teal/[0.08] rounded p-3 text-xs text-neutral-300 font-mono whitespace-pre-wrap overflow-y-auto max-h-48"
               >
                 {output || (status === 'running' ? '…' : '')}
               </pre>
@@ -889,7 +945,7 @@ function RunTaskModal({ skill, onClose }: { skill: SkillManifest; onClose: () =>
           {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
 
-        <div className="px-6 py-4 border-t border-neutral-800 flex justify-end gap-3 shrink-0">
+        <div className="px-6 py-4 border-t border-teal/[0.08] flex justify-end gap-3 shrink-0">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors">
             Close
           </button>
